@@ -5,7 +5,6 @@
 
 
 ##### Define options
-#
 export EDITOR="vim"
 export GREP_COLOR="1;33"
 export VISUAL=$EDITOR
@@ -39,13 +38,13 @@ shopt -s sourcepath              	# The source command will use the PATH variabl
 
 
 ##### History management section
-#
+# Don't laugh, it actually works
 HISTFILESIZE=100000000
 HISTSIZE=100000
 
 # autocompletion
 complete -cf sudo
-# SSH Hostname autocomplete
+# SSH Hostname tab autocomplete from history
 complete -W "$(echo `cat ~/.bash_history | egrep '^ssh ' | sort | uniq | sed 's/^ssh //'`;)" ssh
 
 # history management
@@ -76,7 +75,6 @@ alias ..='cd ..'
 alias grep='grep --color=auto'
 alias vi='vim'
 alias nano='vim'
-alias fact="elinks -dump randomfunfacts.com | sed -n '/^│ /p' | tr -d \│"
 alias visudo='sudo -E visudo'
 
 # new commands
