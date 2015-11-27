@@ -1,5 +1,7 @@
-#Wulf Sőlter's accumulated bash hacks 2015-08-13 10:28
-# .bashrc / .bash_profile
+#Wulf Sőlter's accumulated bash hacks 2013-07-17 10:28
+# .bashrc
+
+
 
 ##### Define options
 #
@@ -10,7 +12,7 @@ export VISUAL=$EDITOR
 # Node.js
 export NODE_PATH="/usr/local/lib/node:/usr/local/share/npm/lib/node_modules:/usr/local/opt/ruby/bin"
 export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
-export PATH=/usr/local/bin:$PATH:~/Code/scripts:/usr/local/share/npm/bin:/usr/local/sbin
+export PATH=/usr/local/bin:$PATH:~/Code/helperscripts:/usr/local/share/npm/bin:/usr/local/sbin
 
 # Mongo
 export MONGO_PATH=/usr/local/mongodb
@@ -32,14 +34,13 @@ if [ "$HOSTNAME" = Wulfs-MBP ]; then
     export PERL5LIB="/home/wulf/perl5/lib/perl5/i686-linux-thread-multi:/home/wulf/perl5/lib/perl5";
     export PATH="/home/wulf/perl5/bin:$PATH";
 
+    export PKG_CONFIG_PATH="/usr/local/opt/zlib";
+
     # Ruby Gems
     # export PATH=/usr/local/Cellar/ruby/2.0.0-p353/lib/ruby/gems/2.0.0:/Users/wulfsolter/.gem/ruby/2.0.0:/usr/local/Cellar/ruby/2.0.0-p353/bin:$PATH
     # export PATH=/usr/local/lib/ruby/gems/2.0.0/gems:$PATH
     # export PATH=/usr/local/Cellar/ruby/2.1.0/lib/ruby/gems/2.1.0:$PATH
     export PATH=$(brew --prefix ruby)/bin:$PATH
-
-    # GoodSync
-    export PATH="/Users/wulfsolter/Library/Application Support/GoodSync":$PATH
 
     # AWS EC2 Tools
     # export JAVA_HOME="$(/usr/libexec/java_home)"
@@ -58,14 +59,11 @@ if [ "$HOSTNAME" = Wulfs-MBP ]; then
         /Applications/Chromium.app/Contents/MacOS/Chromium --enable-memory-info $* 2>&1 &
     }
 
-    alias wwinit='~/Code/helperscripts/wwinit.sh'
-    alias ebp='~/Code/helperscripts/ebp.sh'
-    alias dbpull='~/Code/helperscripts/dbpull.sh'
-
+    alias mtr=/usr/local/sbin/mtr
     alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
     alias espresso='/Users/wulfsolter/Code/Espresso/bin/espresso.js'
     # alias espresso='/usr/local/share/npm/lib/node_modules/espresso/bin/espresso.js'
-    alias logstalgiaWherewolf='ssh wherewolfprod tail -f /var/log/apache2/access.log | logstalgia --sync --full-hostnames --pitch-speed 0.4 --paddle-mode vhost'
+    alias logstalgiaWherewolfWORKER0001='ssh wherewolf-WORKER0001 tail -f /var/log/nginx/access.log | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
 fi
 
 
@@ -95,7 +93,7 @@ shopt -s hostcomplete               # Complete hostnames (TAB).
 ##### History management section
 #
 HISTFILESIZE=100000000
-HISTSIZE=100000
+HISTSIZE=100000000
 
 # autocompletion
 complete -cf sudo
@@ -255,7 +253,7 @@ case "$TERM" in
 esac
 
 # Prompt, Looks like:
-# ┌─[username@host]-[time date]-[directory]
+# ┌─[username@host]-[time date]-[directory] (gitbranch)
 # └─[$]->
 
 PS1='\[\e[0;36m\]┌─[\[\e[0;32m\]\u\[\e[0;34m\]@\[\e[0;31m\]\h\[\e[0m\e[0;36m\]]-[\[\e[0m\]`date +%Y-%m-%d\ %R` - `date +%s`\[\e[0;36m\]]-[\[\e[33;1m\]\w\[\e[0;36m\]]\033[32m\]`parse_git_branch`\n\[\e[0;36m\]└─[\[\e[35m\]\$\[\e[0;36m\]]->\[\e[0m\] '
