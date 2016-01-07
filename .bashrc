@@ -1,4 +1,4 @@
-#Wulf Sőlter's accumulated bash hacks 2013-07-17 10:28
+#Wulf Sőlter's accumulated bash hacks 2016-01-07 14:35
 # .bashrc
 
 
@@ -12,7 +12,13 @@ export VISUAL=$EDITOR
 # Node.js
 export NODE_PATH="/usr/local/lib/node:/usr/local/share/npm/lib/node_modules:/usr/local/opt/ruby/bin"
 export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
-export PATH=/usr/local/bin:$PATH:~/Code/helperscripts:/usr/local/share/npm/bin:/usr/local/sbin
+export PATH=$PATH:/usr/local/bin:/usr/local/share/npm/bin:/usr/local/sbin
+
+# WW HelperScript
+export PATH=$PATH:~/Code/helperscripts
+
+# CloneRow.py
+export PATH=$PATH:~/Code/mysql-clone-row
 
 # Mongo
 export MONGO_PATH=/usr/local/mongodb
@@ -61,11 +67,8 @@ if [ "$HOSTNAME" = Wulfs-MBP ]; then
 
     alias mtr=/usr/local/sbin/mtr
     alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
-    alias espresso='/Users/wulfsolter/Code/Espresso/bin/espresso.js'
-    # alias espresso='/usr/local/share/npm/lib/node_modules/espresso/bin/espresso.js'
     alias logstalgiaWherewolfWORKER0001='ssh wherewolf-WORKER0001 tail -f /var/log/nginx/access.log | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
 fi
-
 
 # Bash options, some of these are already set by default, but to be safe I've defined them here again.
 shopt -s cdspell                    # Try to correct spelling errors in the cd command.
@@ -89,9 +92,11 @@ shopt -s sourcepath                 # The source command will use the PATH varia
 complete -C aws_completer aws
 shopt -s no_empty_cmd_completion    # Self explanatory.
 shopt -s hostcomplete               # Complete hostnames (TAB).
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+(. $(brew --prefix)/etc/bash_completion > /dev/null &)
+fi
 
 ##### History management section
-#
 HISTFILESIZE=100000000
 HISTSIZE=100000000
 
@@ -99,6 +104,7 @@ HISTSIZE=100000000
 complete -cf sudo
 # SSH Hostname autocomplete
 complete -W "$(echo `cat ~/.bash_history | egrep '^ssh ' | sort | uniq | sed 's/^ssh //'`;)" ssh
+complete -W "$(echo `cat ~/.bash_history | egrep '^mosh ' | sort | uniq | sed 's/^mosh //'`;)" mosh
 
 # history management
 shopt -s histappend
@@ -152,6 +158,7 @@ alias gpdm="git push --set-upstream dev master"
 alias gppm="git push prod master"
 alias gpam="git push prod master && git push dev master"
 alias gd="git difftool"
+alias gitbehind="git rev-list --left-right --count origin/master...origin/`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/' | sed 's/[() ]//g'`"
 
 #alias espresso='~/SoftwareLibs/Espresso/bin/espresso.js'
 
@@ -179,6 +186,10 @@ fi
 
 # Make myself slutty for social environs
 umask 002
+
+if [ -f ~/Code/helperscripts/git-completion.bash ]; then
+  . ~/Code/helperscripts/git-completion.bash
+fi
 
 ##### Make myself at home...
 function getsetup {
@@ -253,7 +264,7 @@ case "$TERM" in
 esac
 
 # Prompt, Looks like:
-# ┌─[username@host]-[time date]-[directory] (gitbranch)
+# ┌─[username@host]-[time date]-[directory]
 # └─[$]->
 
 PS1='\[\e[0;36m\]┌─[\[\e[0;32m\]\u\[\e[0;34m\]@\[\e[0;31m\]\h\[\e[0m\e[0;36m\]]-[\[\e[0m\]`date +%Y-%m-%d\ %R` - `date +%s`\[\e[0;36m\]]-[\[\e[33;1m\]\w\[\e[0;36m\]]\033[32m\]`parse_git_branch`\n\[\e[0;36m\]└─[\[\e[35m\]\$\[\e[0;36m\]]->\[\e[0m\] '
