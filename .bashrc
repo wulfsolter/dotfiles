@@ -1,10 +1,9 @@
-#Wulf Sőlter's accumulated bash hacks 2016-01-07 14:35
+#Wulf Sőlter's accumulated bash hacks 2016-12-16 11:10
 # .bashrc
 
 
 
 ##### Define options
-#
 export EDITOR="vim"
 export GREP_COLOR="1;33"
 export VISUAL=$EDITOR
@@ -15,10 +14,7 @@ export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
 export PATH=$PATH:/usr/local/bin:/usr/local/share/npm/bin:/usr/local/sbin
 
 # WW HelperScript
-export PATH=$PATH:~/Code/helperscripts
-
-# CloneRow.py
-export PATH=$PATH:~/Code/mysql-clone-row
+export PATH=$PATH:~/code/helperscripts
 
 # Mongo
 export MONGO_PATH=/usr/local/mongodb
@@ -33,6 +29,10 @@ if [ "$HOSTNAME" = Wulfs-MBP ]; then
     export ANDROID_HOME=/Applications/ADT/sdk
     export PATH=$PATH:$ANDROID_HOME/bin
 
+    # Waterline tests
+    export WATERLINE_ADAPTER_TESTS_USER=wulfsolter
+    export WATERLINE_ADAPTER_TESTS_PASSWORD=N9T4s9ABMt2C6eYc
+
     # Perl5 on Homebrew
     export PERL_LOCAL_LIB_ROOT="/home/wulf/perl5";
     export PERL_MB_OPT="--install_base /home/wulf/perl5";
@@ -41,6 +41,8 @@ if [ "$HOSTNAME" = Wulfs-MBP ]; then
     export PATH="/home/wulf/perl5/bin:$PATH";
 
     export PKG_CONFIG_PATH="/usr/local/opt/zlib";
+
+    export PATH="/Users/wulfsolter/code/clone-row:$PATH";
 
     # Ruby Gems
     # export PATH=/usr/local/Cellar/ruby/2.0.0-p353/lib/ruby/gems/2.0.0:/Users/wulfsolter/.gem/ruby/2.0.0:/usr/local/Cellar/ruby/2.0.0-p353/bin:$PATH
@@ -65,9 +67,22 @@ if [ "$HOSTNAME" = Wulfs-MBP ]; then
         /Applications/Chromium.app/Contents/MacOS/Chromium --enable-memory-info $* 2>&1 &
     }
 
+    canary () {
+        /Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary $* 2>&1 &
+    }
+    randommac() {
+        openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//' | xargs sudo ifconfig en0 ether
+    }
+
+    if [ -f $(brew --prefix)/etc/bash_completion ]; then
+        (. $(brew --prefix)/etc/bash_completion > /dev/null &)
+    fi
+
+    alias is='ionic serve --browser "google chrome canary"'
+    alias logstalgiaWherewolf='ssh wherewolf-WORKER0003 "tail -f /var/log/nginx/wherewolf.log" | grep -v "uptimeCheck" | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
     alias mtr=/usr/local/sbin/mtr
     alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
-    alias logstalgiaWherewolfWORKER0001='ssh wherewolf-WORKER0001 tail -f /var/log/nginx/access.log | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
+    alias brewski='brew update && brew upgrade --all && brew cleanup && brew doctor'
 fi
 
 # Bash options, some of these are already set by default, but to be safe I've defined them here again.
@@ -92,9 +107,6 @@ shopt -s sourcepath                 # The source command will use the PATH varia
 complete -C aws_completer aws
 shopt -s no_empty_cmd_completion    # Self explanatory.
 shopt -s hostcomplete               # Complete hostnames (TAB).
-if [ -f $(brew --prefix)/etc/bash_completion ]; then
-(. $(brew --prefix)/etc/bash_completion > /dev/null &)
-fi
 
 ##### History management section
 HISTFILESIZE=100000000
@@ -137,7 +149,7 @@ alias visudo='sudo -E visudo'
 
 # new commands
 # count inodes: find . -xdev -type f | cut -d "/" -f 2 | sort | uniq -c | sort –n
-alias aptiupdate='sudo aptitude update && sudo aptitude safe-upgrade'
+alias aptiupdate='sudo apt update && sudo apt upgrade'
 alias du1='du --max-depth=1'
 alias hist='history | grep $1'      # requires an argument
 alias fact="elinks -dump randomfunfacts.com | sed -n '/^│ /p' | tr -d \│"
@@ -149,18 +161,18 @@ alias apacheloguseragents="tail -n 10 -F /var/log/apache2/access.log | awk -F\" 
 alias aw='tmux attach -t wulf'
 
 # Git shortcuts
+gitcheckout() {
+    git checkout $1
+}
+alias gc=gitcheckout
 alias gitrds="git reset -- *.DS_Store"
 alias gits="git status"
 alias gitp="git pull"
 alias gp="git pull"
 alias gpom="git pull origin master"
-alias gpdm="git push --set-upstream dev master"
-alias gppm="git push prod master"
-alias gpam="git push prod master && git push dev master"
+alias gsppsp="touch stashtempfile.txt && git stash > /dev/null && git pull && git push && git stash pop > /dev/null && rm stashtempfile.txt && git status"
 alias gd="git difftool"
 alias gitbehind="git rev-list --left-right --count origin/master...origin/`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/' | sed 's/[() ]//g'`"
-
-#alias espresso='~/SoftwareLibs/Espresso/bin/espresso.js'
 
 # ls
 #alias ls='ls -hF --color=always'
@@ -184,11 +196,14 @@ if [ $UID -ne 0 ]; then
     alias netcfg='sudo netcfg2'
 fi
 
-# Make myself slutty for social environs
-umask 002
+### Bash completion for git if available
+if [ -f ~/code/helperscripts/git-completion.bash ]; then
+  . ~/code/helperscripts/git-completion.bash
+fi
 
-if [ -f ~/Code/helperscripts/git-completion.bash ]; then
-  . ~/Code/helperscripts/git-completion.bash
+### Get docker shit for Wherewolf
+if [ -f ~/code/helperscripts/bash/core ]; then
+  . ~/code/helperscripts/bash/core
 fi
 
 ##### Make myself at home...
@@ -264,9 +279,9 @@ case "$TERM" in
 esac
 
 # Prompt, Looks like:
-# ┌─[username@host]-[time date]-[directory]
+# ┌─[username@host]-[time date]-[directory] (git branch)
 # └─[$]->
 
-PS1='\[\e[0;36m\]┌─[\[\e[0;32m\]\u\[\e[0;34m\]@\[\e[0;31m\]\h\[\e[0m\e[0;36m\]]-[\[\e[0m\]`date +%Y-%m-%d\ %R` - `date +%s`\[\e[0;36m\]]-[\[\e[33;1m\]\w\[\e[0;36m\]]\033[32m\]`parse_git_branch`\n\[\e[0;36m\]└─[\[\e[35m\]\$\[\e[0;36m\]]->\[\e[0m\] '
+PS1='\[\e[0;36m\]┌─[\[\e[0;32m\]\u\[\e[0;34m\]@\[\e[0;31m\]\h\[\e[0m\e[0;36m\]]-[\[\e[0m\]`date +%Y-%m-%d\ %R` - `date +%s`\[\e[0;36m\]]-[\[\e[33;1m\]\w\[\e[0;36m\]]\[\e[0;32m\]`parse_git_branch`\n\[\e[0;36m\]└─[\[\e[35m\]\$\[\e[0;36m\]]->\[\e[0m\] '
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
