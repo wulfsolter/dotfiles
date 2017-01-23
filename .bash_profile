@@ -9,6 +9,11 @@ export EDITOR="vim"
 export GREP_COLOR="1;33"
 export VISUAL=$EDITOR
 
+# Set locale
+export LC_ALL=en_NZ.UTF-8
+export LANG=en_NZ.UTF-8
+export LC_MESSAGES="C"
+
 # Node.js
 export NODE_PATH="/usr/local/lib/node:/usr/local/share/npm/lib/node_modules:/usr/local/opt/ruby/bin"
 export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
@@ -24,6 +29,13 @@ export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 export MONGO_PATH=/usr/local/mongodb
 export PATH=$PATH:$MONGO_PATH/bin
 
+if [ "$HOSTNAME" = thinkpad ]; then
+
+    alias logstalgiaWherewolf='ssh wherewolf-WORKER0001 "tail -f /var/log/nginx/wherewolf.log" | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
+
+    # alias logstalgiaWherewolf='ssh wherewolf-WORKER0001 "tail -f /var/log/nginx/wherewolf.log" | grep -v "uptimeCheck" | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
+fi
+
 if [ "$HOSTNAME" = Wulfs-MBP ]; then
     # Python 2.7
     export PYTHONPATH=/usr/local/lib/python2.7/site-packages/
@@ -32,10 +44,6 @@ if [ "$HOSTNAME" = Wulfs-MBP ]; then
     # export PATH="/Users/wulfsolter/SoftwareLibs/adt-bundle/sdk/platform-tools":$PATH
     export ANDROID_HOME=/Applications/ADT/sdk
     export PATH=$PATH:$ANDROID_HOME/bin
-
-    # Waterline tests
-    export WATERLINE_ADAPTER_TESTS_USER=wulfsolter
-    export WATERLINE_ADAPTER_TESTS_PASSWORD=N9T4s9ABMt2C6eYc
 
     # Perl5 on Homebrew
     export PERL_LOCAL_LIB_ROOT="/home/wulf/perl5";
@@ -83,7 +91,6 @@ if [ "$HOSTNAME" = Wulfs-MBP ]; then
     fi
 
     alias is='ionic serve --browser "google chrome canary"'
-    alias logstalgiaWherewolf='ssh wherewolf-WORKER0003 "tail -f /var/log/nginx/wherewolf.log" | grep -v "uptimeCheck" | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
     alias mtr=/usr/local/sbin/mtr
     alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
     alias brewski='brew update && brew upgrade --all && brew cleanup && brew doctor'
@@ -217,17 +224,53 @@ function getsetup {
     echo
     echo 'Copying dotfiles'
     # symlink in dotfiles
-    ln -s ~/code/dotfiles/.bashrc ~ ;
-    ln -s ~/code/dotfiles/.bash_profile ~ ;
-    ln -s ~/code/dotfiles/.gitconfig ~ ;
+    if [ -f ~/.bashrc ]; then
+        if [ `cksum ~/.bashrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.bashrc | awk -F" " '{print $1}'` ]; then
+            echo '  .bashrc same not doing anything'
+        else
+            mkdir -p ~/code/dotfiles/old
+            mv -f ~/.bashrc ~/code/dotfiles/old
+            echo 'Moved old .bashrc'
+            ln -s ~/code/dotfiles/.bashrc ~ ;
+        fi
+    fi
+
+    if [ -f ~/.bash_profile ]; then
+        if [ `cksum ~/.bash_profile | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.bash_profile | awk -F" " '{print $1}'` ]; then
+            echo '  .bash_profile same not doing anything'
+        else
+            mkdir -p ~/code/dotfiles/old
+            mv -f ~/.bash_profile ~/code/dotfiles/old
+            echo 'Moved old .bash_profile'
+            ln -s ~/code/dotfiles/.bash_profile ~ ;
+        fi
+    fi
+
+    if [ -f ~/.gitconfig ]; then
+        if [ `cksum ~/.gitconfig | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.gitconfig | awk -F" " '{print $1}'` ]; then
+            echo '  .gitconfig same not doing anything'
+        else
+            mkdir -p ~/code/dotfiles/old
+            mv -f ~/.gitconfig ~/code/dotfiles/old
+            echo 'Moved old .gitconfig'
+            ln -s ~/code/dotfiles/.gitconfig ~ ;
+        fi
+    fi
+
     # ln -s ~/code/dotfiles/.vimrc ~ ;
     # ln -s ~/code/dotfiles/.inputrc ~ ;
 
     echo
     echo 'Setting npm config'
 
-	npm config set save=true
-	npm config set save-exact=true
+    if [ ! -e `which npm` ]; then
+        echo 'npm not installed'
+    else
+        npm config set save=true
+        echo 'npm config set save=true'
+        npm config set save-exact=true
+        echo 'npm config set save-exact=true'
+    fi
 
     echo
     echo 'Done!'
