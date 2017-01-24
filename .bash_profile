@@ -224,6 +224,8 @@ function getsetup {
     echo
     echo 'Copying dotfiles'
     # symlink in dotfiles
+
+    # ~/.bashrc
     if [ -f ~/.bashrc ]; then
         if [ `cksum ~/.bashrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.bashrc | awk -F" " '{print $1}'` ]; then
             echo '  .bashrc same not doing anything'
@@ -235,6 +237,7 @@ function getsetup {
         fi
     fi
 
+    # ~/.bash_profile
     if [ -f ~/.bash_profile ]; then
         if [ `cksum ~/.bash_profile | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.bash_profile | awk -F" " '{print $1}'` ]; then
             echo '  .bash_profile same not doing anything'
@@ -246,6 +249,7 @@ function getsetup {
         fi
     fi
 
+    # ~/.gitconfig
     if [ -f ~/.gitconfig ]; then
         if [ `cksum ~/.gitconfig | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.gitconfig | awk -F" " '{print $1}'` ]; then
             echo '  .gitconfig same not doing anything'
@@ -257,8 +261,37 @@ function getsetup {
         fi
     fi
 
-    # ln -s ~/code/dotfiles/.vimrc ~ ;
-    # ln -s ~/code/dotfiles/.inputrc ~ ;
+    # ~/.inputrc
+    if [ -f ~/.inputrc ]; then
+        if [ `cksum ~/.inputrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.inputrc | awk -F" " '{print $1}'` ]; then
+            echo '  .inputrc same not doing anything'
+        else
+            mkdir -p ~/code/dotfiles/old
+            mv -f ~/.inputrc ~/code/dotfiles/old
+            echo 'Moved old .inputrc'
+            ln -s ~/code/dotfiles/.inputrc ~ ;
+        fi
+    fi
+
+    # ~/.vimrc
+    if [ -f ~/.vimrc ]; then
+        if [ `cksum ~/.vimrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.vimrc | awk -F" " '{print $1}'` ]; then
+            echo '  .vimrc same not doing anything'
+        else
+            mkdir -p ~/code/dotfiles/old
+            mv -f ~/.vimrc ~/code/dotfiles/old
+            echo 'Moved old .vimrc'
+            ln -s ~/code/dotfiles/.vimrc ~ ;
+        fi
+    fi
+
+    # Sublime Text 3 User Config
+    if [ -d ~/.config/sublime-text-3/Packages/User ]; then
+        mkdir -p ~/code/dotfiles/old
+        mv -f ~/.config/sublime-text-3/Packages/User ~/code/dotfiles/old
+        echo 'Moved old Subl3/Packages/User'
+        ln -s ~/code/dotfiles/subl3/User ~/.config/sublime-text-3/Packages/User ;
+    fi
 
     echo
     echo 'Setting npm config'
