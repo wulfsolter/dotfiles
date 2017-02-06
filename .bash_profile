@@ -342,10 +342,31 @@ function prompt_command {
     #Give a new line - the -e flag is for echo to enable interpretaion of backslash escapes
     #echo -e "\n"
     echo ''
+
+    ### Check if restart is required
+    # Debian/Ubuntu
     if [ -f /var/run/reboot-required ]; then
         echo -e '\e[1;7m *** RESTART REQUIRED *** \e[0m due to:'
         cat /var/run/reboot-required.pkgs
     fi
+    # Arch
+    NEXTLINE=0
+    FIND=""
+    for I in `file /boot/vmlinuz*`; do
+      if [ ${NEXTLINE} -eq 1 ]; then
+        FIND="${I}"
+        NEXTLINE=0
+       else
+        if [ "${I}" = "version" ]; then NEXTLINE=1; fi
+      fi
+    done
+    if [ ! "${FIND}" = "" ]; then
+      CURRENT_KERNEL=`uname -r`
+      if [ ! "${CURRENT_KERNEL}" = "${FIND}" ]; then
+        echo -e '\e[1;7m *** RESTART REQUIRED *** \e[0m'
+      fi
+    fi
+
 }
 
 # Bind up/down arrows history search.
