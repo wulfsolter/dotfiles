@@ -1,7 +1,5 @@
 #Wulf Sőlter's accumulated bash hacks 2017-01-10
-# .bashrc
-
-
+# .bashrc / .bash_profile
 
 ##### Define options
 #
@@ -29,6 +27,9 @@ export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 export MONGO_PATH=/usr/local/mongodb
 export PATH=$PATH:$MONGO_PATH/bin
 
+# Clone Row
+export PATH="$PATH:$HOME/code/clone-row";
+
 if [ "$HOSTNAME" = thinkpad ]; then
 
     alias logstalgiaWherewolf='ssh wherewolf-WORKER0001 "tail -f /var/log/nginx/wherewolf.log" | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
@@ -54,7 +55,6 @@ if [ "$HOSTNAME" = Wulfs-MBP ]; then
 
     export PKG_CONFIG_PATH="/usr/local/opt/zlib";
 
-    export PATH="/Users/wulfsolter/code/clone-row:$PATH";
 
     # Ruby Gems
     # export PATH=/usr/local/Cellar/ruby/2.0.0-p353/lib/ruby/gems/2.0.0:/Users/wulfsolter/.gem/ruby/2.0.0:/usr/local/Cellar/ruby/2.0.0-p353/bin:$PATH
@@ -342,10 +342,9 @@ function prompt_command {
     #Give a new line - the -e flag is for echo to enable interpretaion of backslash escapes
     #echo -e "\n"
     echo ''
-    if [ -f /var/run/reboot-required ]
-        then
-	echo -e '\e[1;7m *** RESTART REQUIRED *** \e[0m due to:'
-	cat /var/run/reboot-required.pkgs
+    if [ -f /var/run/reboot-required ]; then
+        echo -e '\e[1;7m *** RESTART REQUIRED *** \e[0m due to:'
+        cat /var/run/reboot-required.pkgs
     fi
 }
 
