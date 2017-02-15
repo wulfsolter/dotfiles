@@ -5,10 +5,13 @@
 	],
 	"installed_packages":
 	[
+		"EJS 2",
+		"JSCS-Formatter",
 		"Package Control",
 		"SublimeLinter",
 		"SublimeLinter-jscs",
 		"SublimeLinter-jshint",
+		"TrailingSpaces",
 		"TypeScript"
 	]
 }
