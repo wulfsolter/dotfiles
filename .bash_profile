@@ -281,6 +281,20 @@ function getsetup {
        ln -s ~/code/dotfiles/.inputrc ~ ;
     fi
 
+    # ~/.psqlrc
+    if [ -f ~/.psqlrc ]; then
+        if [ `cksum ~/.psqlrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.psqlrc | awk -F" " '{print $1}'` ]; then
+            echo '  .psqlrc same not doing anything'
+        else
+            mkdir -p ~/code/dotfiles/old
+            mv -f ~/.psqlrc ~/code/dotfiles/old
+            echo 'Moved old .psqlrc'
+            ln -s ~/code/dotfiles/.psqlrc ~ ;
+        fi
+    else
+        ln -s ~/code/dotfiles/.psqlrc ~ ;
+    fi
+
     # ~/.vimrc
     if [ -f ~/.vimrc ]; then
         if [ `cksum ~/.vimrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.vimrc | awk -F" " '{print $1}'` ]; then
