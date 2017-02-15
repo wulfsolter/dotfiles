@@ -235,6 +235,8 @@ function getsetup {
             echo 'Moved old .bashrc'
             ln -s ~/code/dotfiles/.bashrc ~ ;
         fi
+    else
+        ln -s ~/code/dotfiles/.bashrc ~ ;
     fi
 
     # ~/.bash_profile
@@ -247,6 +249,8 @@ function getsetup {
             echo 'Moved old .bash_profile'
             ln -s ~/code/dotfiles/.bash_profile ~ ;
         fi
+    else
+        ln -s ~/code/dotfiles/.bash_profile ~ ;
     fi
 
     # ~/.gitconfig
@@ -259,6 +263,8 @@ function getsetup {
             echo 'Moved old .gitconfig'
             ln -s ~/code/dotfiles/.gitconfig ~ ;
         fi
+    else
+        ln -s ~/code/dotfiles/.gitconfig ~ ;
     fi
 
     # ~/.inputrc
@@ -271,6 +277,8 @@ function getsetup {
             echo 'Moved old .inputrc'
             ln -s ~/code/dotfiles/.inputrc ~ ;
         fi
+    else
+       ln -s ~/code/dotfiles/.inputrc ~ ;
     fi
 
     # ~/.vimrc
@@ -283,6 +291,8 @@ function getsetup {
             echo 'Moved old .vimrc'
             ln -s ~/code/dotfiles/.vimrc ~ ;
         fi
+    else
+       ln -s ~/code/dotfiles/.vimrc ~ ;
     fi
 
     # Sublime Text 3 User Config
