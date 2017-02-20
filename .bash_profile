@@ -295,6 +295,20 @@ function getsetup {
         ln -s ~/code/dotfiles/.psqlrc ~ ;
     fi
 
+    # ~/.tmux.conf
+    if [ -f ~/.tmux.conf ]; then
+        if [ `cksum ~/.tmux.conf | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.tmux.conf | awk -F" " '{print $1}'` ]; then
+            echo '  .tmux.conf same not doing anything'
+        else
+            mkdir -p ~/code/dotfiles/old
+            mv -f ~/.tmux.conf ~/code/dotfiles/old
+            echo 'Moved old .tmux.conf'
+            ln -s ~/code/dotfiles/.tmux.conf ~ ;
+        fi
+    else
+        ln -s ~/code/dotfiles/.tmux.conf ~ ;
+    fi
+
     # ~/.vimrc
     if [ -f ~/.vimrc ]; then
         if [ `cksum ~/.vimrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.vimrc | awk -F" " '{print $1}'` ]; then
