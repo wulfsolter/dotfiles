@@ -27,8 +27,14 @@ function gits {
     git status
 }
 
-function subl([string]$arg1) {
-    C:\Program` Files\Sublime` Text` 3\sublime_text.exe $arg1
+function Maximise-All-Windows {
+    $dllInfo = '[DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);'
+    Add-Type -MemberDefinition $dllInfo -name NativeMethods -namespace Win32
+    foreach($proc in Get-Process){
+        $hwnd = $proc.MainWindowHandle
+        # Restore window
+        [Win32.NativeMethods]::ShowWindowAsync($hwnd, 3) | Out-Null
+    }    
 }
 
 function Meld([string]$arg1, [string]$arg2) {
@@ -39,12 +45,16 @@ function reboot() {
     shutdown -t 0 -r -f
 }
 
+function subl([string]$arg1) {
+    C:\Program` Files\Sublime` Text` 3\sublime_text.exe $arg1
+}
+
 function tig() {
     if(-Not ($env:PATH.Contains("C:\cygwin64\bin"))) {
         echo 'cygwin not in path, appending environment variable'
         $env:PATH += ";C:\cygwin64\bin\";
     }
-    iex -c 'C:\cygwin64\bin\bash.exe -c "/usr/bin/tig"';
+    iex -c 'C:\cygwin64\bin\bash.exe -c "/usr/bin/tig"';    
 }
 
 Set-Location ~/code
