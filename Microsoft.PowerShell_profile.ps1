@@ -33,6 +33,7 @@ function Maximise-All-Windows {
     foreach($proc in Get-Process){
         $hwnd = $proc.MainWindowHandle
         # Restore window
+        # second param is nCmdShow(int) - what action to take - https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx
         [Win32.NativeMethods]::ShowWindowAsync($hwnd, 3) | Out-Null
     }    
 }
