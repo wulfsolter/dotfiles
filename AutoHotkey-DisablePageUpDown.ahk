@@ -3,25 +3,23 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
-#SingleInstance force
-
-^j::
-   Send, My First Script
-Return
+#SingleInstance force ; Make this override previous versions of this for when I'm editing
 
 PgUp::
-;  Do nothing
+  ;  Do nothing
 Return
 
 PgDn::
-;  Do nothing
+  ;  Do nothing
 Return
 
 ^PgUp::
+  ; Send PgUp
   Send, {PgUp}
 Return
 
 ^PgDn::
+  ; Send PgDn
   Send, {PgDn}
 Return
 
