@@ -1,8 +1,17 @@
+﻿
+#Import-Module posh-git
+Import-Module 'C:\Users\User\code\posh-git\src\posh-git.psd1'
 
-Import-Module posh-git
+# PowerShell ReadLine enhancements
+# https://github.com/lzybkr/PSReadLine
+if ($host.Name -eq 'ConsoleHost')
+{
+    Import-Module PSReadline
+    Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
+    Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
+    Set-PSReadlineKeyHandler -Key Tab -Function Complete
 
-# Import-Module PowerTab
-
+}
 
 # Chocolatey profile
 $ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
@@ -11,6 +20,14 @@ if (Test-Path($ChocolateyProfile)) {
 }
 
 function Docker-Connect {
+
+    $StatusOfDev = docker ps -a --filter "name=dev" --format "{{.Status}}"
+
+    if ($StatusOfDev.StartsWith("Exit")) {
+      docker start postgres
+      docker start dev
+    }
+
     docker exec -t -i dev /bin/bash -c 'su - wherewolf'
 }
 
@@ -33,9 +50,8 @@ function Maximise-All-Windows {
     foreach($proc in Get-Process){
         $hwnd = $proc.MainWindowHandle
         # Restore window
-        # second param is nCmdShow(int) - what action to take - https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx
         [Win32.NativeMethods]::ShowWindowAsync($hwnd, 3) | Out-Null
-    }    
+    }
 }
 
 function Meld([string]$arg1, [string]$arg2) {
@@ -55,7 +71,7 @@ function tig() {
         echo 'cygwin not in path, appending environment variable'
         $env:PATH += ";C:\cygwin64\bin\";
     }
-    iex -c 'C:\cygwin64\bin\bash.exe -c "/usr/bin/tig"';    
+    iex -c 'C:\cygwin64\bin\bash.exe -c "/usr/bin/tig"';
 }
 
 Set-Location ~/code
