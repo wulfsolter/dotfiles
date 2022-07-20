@@ -1,8 +1,7 @@
-#Wulf Sőlter's accumulated bash hacks 2017-01-10
+#Wulf Sőlter's accumulated bash hacks 2022-07-20
 # .bashrc / .bash_profile
 
 ##### Define options
-#
 export EDITOR="vim"
 export GREP_COLOR="1;33"
 export VISUAL=$EDITOR
@@ -18,82 +17,14 @@ export NODE_PATH=$NODE_PATH:/usr/local/lib/node_modules
 export PATH=$PATH:/usr/local/bin:/usr/local/share/npm/bin:/usr/local/sbin
 
 # WW HelperScript
-export PATH=$PATH:~/code/helperscripts
-
-# Ruby VM
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
-# Mongo
-export MONGO_PATH=/usr/local/mongodb
-export PATH=$PATH:$MONGO_PATH/bin
+export PATH=$PATH:~/code/wherewolf/helperscripts
 
 # Clone Row
 export PATH="$PATH:$HOME/code/clone-row";
 
 if [ "$HOSTNAME" = thinkpad ]; then
-
     alias logstalgiaWherewolf='ssh wherewolf-WORKER0001 "tail -f /var/log/nginx/wherewolf.log" | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
-
     # alias logstalgiaWherewolf='ssh wherewolf-WORKER0001 "tail -f /var/log/nginx/wherewolf.log" | grep -v "uptimeCheck" | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
-fi
-
-if [ "$HOSTNAME" = Wulfs-MBP ]; then
-    # Python 2.7
-    export PYTHONPATH=/usr/local/lib/python2.7/site-packages/
-
-    # Android SDK
-    # export PATH="/Users/wulfsolter/SoftwareLibs/adt-bundle/sdk/platform-tools":$PATH
-    export ANDROID_HOME=/Applications/ADT/sdk
-    export PATH=$PATH:$ANDROID_HOME/bin
-
-    # Perl5 on Homebrew
-    export PERL_LOCAL_LIB_ROOT="/home/wulf/perl5";
-    export PERL_MB_OPT="--install_base /home/wulf/perl5";
-    export PERL_MM_OPT="INSTALL_BASE=/home/wulf/perl5";
-    export PERL5LIB="/home/wulf/perl5/lib/perl5/i686-linux-thread-multi:/home/wulf/perl5/lib/perl5";
-    export PATH="/home/wulf/perl5/bin:$PATH";
-
-    export PKG_CONFIG_PATH="/usr/local/opt/zlib";
-
-
-    # Ruby Gems
-    # export PATH=/usr/local/Cellar/ruby/2.0.0-p353/lib/ruby/gems/2.0.0:/Users/wulfsolter/.gem/ruby/2.0.0:/usr/local/Cellar/ruby/2.0.0-p353/bin:$PATH
-    # export PATH=/usr/local/lib/ruby/gems/2.0.0/gems:$PATH
-    # export PATH=/usr/local/Cellar/ruby/2.1.0/lib/ruby/gems/2.1.0:$PATH
-    export PATH=$(brew --prefix ruby)/bin:$PATH
-
-    # AWS EC2 Tools
-    # export JAVA_HOME="$(/usr/libexec/java_home)"
-    # export AWS_AUTO_SCALING_HOME="/usr/local/Cellar/auto-scaling/1.0.61.4/libexec"
-    # export AWS_CLOUDFORMATION_HOME="/usr/local/Cellar/aws-cfn-tools/1.0.12/libexec"
-    # export EC2_AMITOOL_HOME="/usr/local/Cellar/ec2-ami-tools/1.4.0.9/libexec"
-    # export EC2_CERT="$(/bin/ls "$HOME"/.ec2/cert-*.pem | /usr/bin/head -1)"
-    # export EC2_HOME="/usr/local/Library/LinkedKegs/ec2-api-tools/jars"
-    # export EC2_PRIVATE_KEY="$(/bin/ls "$HOME"/.ec2/pk-*.pem | /usr/bin/head -1)"
-
-    # Google Chrome & Chromium from the command line bitchez
-    chrome () {
-        /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome $* 2>&1 &
-    }
-    chromium () {
-        /Applications/Chromium.app/Contents/MacOS/Chromium --enable-memory-info $* 2>&1 &
-    }
-
-    canary () {
-        /Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary $* 2>&1 &
-    }
-    randommac() {
-        openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//' | xargs sudo ifconfig en0 ether
-    }
-
-    if [ -f $(brew --prefix)/etc/bash_completion ]; then
-        (. $(brew --prefix)/etc/bash_completion > /dev/null &)
-    fi
-
-    alias is='ionic serve --browser "google chrome canary"'
-    alias mtr=/usr/local/sbin/mtr
-    alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
-    alias brewski='brew update && brew upgrade --all && brew cleanup && brew doctor'
 fi
 
 # Bash options, some of these are already set by default, but to be safe I've defined them here again.
@@ -162,13 +93,14 @@ alias nano='vim'
 alias aptiupdate='sudo apt update && sudo apt upgrade'
 alias du1='du --max-depth=1'
 alias hist='history | grep $1'      # requires an argument
-alias fact="elinks -dump randomfunfacts.com | sed -n '/^│ /p' | tr -d \│"
-alias srcbashrc='source ~/.bashrc'
-alias srcbashprofile='source ~/.bash_profile'
 alias openports='netstat --all --numeric --programs --inet'
 alias whoshitting="sudo netstat -anp | grep 'tcp\|upd' | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -n"
 alias apacheloguseragents="tail -n 10 -F /var/log/apache2/access.log | awk -F\" '{print $6}'"
-alias aw='tmux attach -t wulf'
+alias tmx='tmux a || tmux new'
+alias mw1='mosh worker1'
+alias mw2='mosh worker2'
+alias mw3='mosh worker3'
+alias mw4='mosh worker4'
 
 # Git shortcuts
 gitcheckout() {
@@ -201,171 +133,22 @@ if [ $UID -ne 0 ]; then
     alias root='sudo su'
     alias reboot='sudo reboot'
     alias halt='sudo halt'
-    alias update='sudo pacman -Su'
     alias netcfg='sudo netcfg2'
 fi
 
 ### Bash completion for git if available
-if [ -f ~/code/helperscripts/git-completion.bash ]; then
-  . ~/code/helperscripts/git-completion.bash
+if [ -f ~/code/wherewolf/helperscripts/git-completion.bash ]; then
+  . ~/code/wherewolf/helperscripts/git-completion.bash
 fi
 
 ### Get docker shit for Wherewolf
-if [ -f ~/code/helperscripts/bash/core ]; then
-  . ~/code/helperscripts/bash/core
+if [ -f ~/code/wherewolf/helperscripts/bash/core ]; then
+  . ~/code/wherewolf/helperscripts/bash/core
 fi
-
-##### Make myself at home on first run...
-function getsetup {
-
-    echo 'Getting settup'
-    echo '--------------'
-
-    echo
-    echo 'Copying dotfiles'
-    # symlink in dotfiles
-
-    # ~/.bashrc
-    if [ -f ~/.bashrc ]; then
-        if [ `cksum ~/.bashrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.bashrc | awk -F" " '{print $1}'` ]; then
-            echo '  .bashrc same not doing anything'
-        else
-            mkdir -p ~/code/dotfiles/old
-            mv -f ~/.bashrc ~/code/dotfiles/old
-            echo 'Moved old .bashrc'
-            ln -s ~/code/dotfiles/.bashrc ~ ;
-        fi
-    else
-        ln -s ~/code/dotfiles/.bashrc ~ ;
-    fi
-
-    # ~/.bash_profile
-    if [ -f ~/.bash_profile ]; then
-        if [ `cksum ~/.bash_profile | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.bash_profile | awk -F" " '{print $1}'` ]; then
-            echo '  .bash_profile same not doing anything'
-        else
-            mkdir -p ~/code/dotfiles/old
-            mv -f ~/.bash_profile ~/code/dotfiles/old
-            echo 'Moved old .bash_profile'
-            ln -s ~/code/dotfiles/.bash_profile ~ ;
-        fi
-    else
-        ln -s ~/code/dotfiles/.bash_profile ~ ;
-    fi
-
-    # ~/.gitconfig
-    if [ -f ~/.gitconfig ]; then
-        if [ `cksum ~/.gitconfig | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.gitconfig | awk -F" " '{print $1}'` ]; then
-            echo '  .gitconfig same not doing anything'
-        else
-            mkdir -p ~/code/dotfiles/old
-            mv -f ~/.gitconfig ~/code/dotfiles/old
-            echo 'Moved old .gitconfig'
-            ln -s ~/code/dotfiles/.gitconfig ~ ;
-        fi
-    else
-        ln -s ~/code/dotfiles/.gitconfig ~ ;
-    fi
-
-    # ~/.inputrc
-    if [ -f ~/.inputrc ]; then
-        if [ `cksum ~/.inputrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.inputrc | awk -F" " '{print $1}'` ]; then
-            echo '  .inputrc same not doing anything'
-        else
-            mkdir -p ~/code/dotfiles/old
-            mv -f ~/.inputrc ~/code/dotfiles/old
-            echo 'Moved old .inputrc'
-            ln -s ~/code/dotfiles/.inputrc ~ ;
-        fi
-    else
-       ln -s ~/code/dotfiles/.inputrc ~ ;
-    fi
-
-    # ~/.psqlrc
-    if [ -f ~/.psqlrc ]; then
-        if [ `cksum ~/.psqlrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.psqlrc | awk -F" " '{print $1}'` ]; then
-            echo '  .psqlrc same not doing anything'
-        else
-            mkdir -p ~/code/dotfiles/old
-            mv -f ~/.psqlrc ~/code/dotfiles/old
-            echo 'Moved old .psqlrc'
-            ln -s ~/code/dotfiles/.psqlrc ~ ;
-        fi
-    else
-        ln -s ~/code/dotfiles/.psqlrc ~ ;
-    fi
-
-    # ~/.tmux.conf
-    if [ -f ~/.tmux.conf ]; then
-        if [ `cksum ~/.tmux.conf | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.tmux.conf | awk -F" " '{print $1}'` ]; then
-            echo '  .tmux.conf same not doing anything'
-        else
-            mkdir -p ~/code/dotfiles/old
-            mv -f ~/.tmux.conf ~/code/dotfiles/old
-            echo 'Moved old .tmux.conf'
-            ln -s ~/code/dotfiles/.tmux.conf ~ ;
-        fi
-    else
-        ln -s ~/code/dotfiles/.tmux.conf ~ ;
-    fi
-
-    # ~/.vimrc
-    if [ -f ~/.vimrc ]; then
-        if [ `cksum ~/.vimrc | awk -F" " '{print $1}'` -eq `cksum ~/code/dotfiles/.vimrc | awk -F" " '{print $1}'` ]; then
-            echo '  .vimrc same not doing anything'
-        else
-            mkdir -p ~/code/dotfiles/old
-            mv -f ~/.vimrc ~/code/dotfiles/old
-            echo 'Moved old .vimrc'
-            ln -s ~/code/dotfiles/.vimrc ~ ;
-        fi
-    else
-       ln -s ~/code/dotfiles/.vimrc ~ ;
-    fi
-
-    # Sublime Text 3 User Config
-    if [ -d ~/.config/sublime-text-3/Packages/User ]; then
-        mkdir -p ~/code/dotfiles/old
-        mv -f ~/.config/sublime-text-3/Packages/User ~/code/dotfiles/old
-        echo 'Moved old Subl3/Packages/User'
-        ln -s ~/code/dotfiles/subl3/User ~/.config/sublime-text-3/Packages/User ;
-    fi
-
-    echo
-    echo 'Setting npm config'
-
-    if [ ! -e `which npm` ]; then
-        echo 'npm not installed'
-    else
-        npm config set save=true
-        echo 'npm config set save=true'
-        npm config set save-exact=true
-        echo 'npm config set save-exact=true'
-    fi
-
-    echo
-    echo 'Done!'
-}
 
 ## get current git branch
 parse_git_branch() {
     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-}
-
-# Turn on colours.
-#case "$TERM" in
-#    xterm-color)
-#    color_prompt=yes;;
-#esac
-
-# make a function called '=' which is a shortcut to 'bc', a calculator of sorts
-#  usage: 
-#  $ = 180/50
-#  $ = 100-90
-=() {
-    calc="${@//p/+}"
-    calc="${calc//x/*}"
-    bc -l <<<"scale=10;$calc"
 }
 
 function prompt_command {
@@ -432,5 +215,3 @@ esac
 # └─[$]->
 
 PS1='\[\e[0;36m\]┌─[\[\e[0;32m\]\u\[\e[0;34m\]@\[\e[0;31m\]\h\[\e[0m\e[0;36m\]]-[\[\e[0m\]`date +%Y-%m-%d\ %R` - `date +%s`\[\e[0;36m\]]-[\[\e[33;1m\]\w\[\e[0;36m\]]\[\e[0;32m\]`parse_git_branch`\n\[\e[0;36m\]└─[\[\e[35m\]\$\[\e[0;36m\]]->\[\e[0m\] '
-
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
