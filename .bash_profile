@@ -18,6 +18,7 @@ export PATH=$PATH:/usr/local/bin:/usr/local/share/npm/bin:/usr/local/sbin
 
 # WW HelperScript
 export PATH=$PATH:~/code/wherewolf/helperscripts
+export WW_CODE_DIR=/home/wulf/code/wherewolf
 
 # Clone Row
 export PATH="$PATH:$HOME/code/clone-row";
@@ -91,6 +92,7 @@ alias nano='vim'
 # new commands
 # count inodes: find . -xdev -type f | cut -d "/" -f 2 | sort | uniq -c | sort –n
 alias aptiupdate='sudo apt update && sudo apt upgrade'
+alias dockerstopallremoveall='docker stop $(docker ps -a -q) || true && docker rm $(docker ps -a -q) || true'
 alias du1='du --max-depth=1'
 alias hist='history | grep $1'      # requires an argument
 alias openports='netstat --all --numeric --programs --inet'
@@ -150,6 +152,18 @@ fi
 parse_git_branch() {
     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
 }
+
+# function to run something multiple times
+# usage:
+# $ run_times 10 cat foo.txt
+run_times() {(
+    set -e # fail early
+    number=$1
+    shift
+    for i in `seq $number`; do
+      $@
+    done
+)}
 
 function prompt_command {
     # Run this function every time a prompt is displayed.
