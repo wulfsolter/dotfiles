@@ -64,7 +64,7 @@ complete -W "$(echo `cat ~/.bash_history | egrep '^ssh ' | sort | uniq | sed 's/
 complete -W "$(echo `cat ~/.bash_history | egrep '^mosh ' | sort | uniq | sed 's/^mosh //'`;)" mosh
 
 # stop the noisey bell!!
-set bell-style none
+bind 'set bell-style none'
 
 # make me slutty - all my friends can play with my bits
 umask 002
@@ -89,6 +89,26 @@ alias vi='vim'
 alias more='less'
 alias nano='vim'
 
+# Make VSCode open a file in parent workspace
+code() {
+  # Get root of current git directory
+  # https://unix.stackexchange.com/a/6470
+  CURRENT_WORKSPACE_DIR=$(git rev-parse --show-toplevel)
+
+  # wrap the whole shit in double quotes and then more escaped double quotes around that
+  VSCODE_PATH=\""/mnt/c/Users/Lenovo/AppData/Local/Programs/Microsoft VS Code/bin/code"\"
+
+  # If CURRENT_WORKSPACE_DIR returned a path and that path has a vscode.code-workspace file
+  if ! [[ $CURRENT_WORKSPACE_DIR == *"fatal: not a git repository" ]] && [ -f "${CURRENT_WORKSPACE_DIR}/vscode.code-workspace" ]; then
+    eval $VSCODE_PATH "${CURRENT_WORKSPACE_DIR}/vscode.code-workspace" \""$@"\"
+
+  # Not in a repo with a vscode.code-workspace file, or file does not exist - run plain VSCode
+  else
+    eval $VSCODE_PATH \""$@"\"
+
+  fi
+}
+
 # new commands
 # count inodes: find . -xdev -type f | cut -d "/" -f 2 | sort | uniq -c | sort –n
 alias aptiupdate='sudo apt update && sudo apt upgrade'
@@ -103,6 +123,8 @@ alias mw1='mosh worker1'
 alias mw2='mosh worker2'
 alias mw3='mosh worker3'
 alias mw4='mosh worker4'
+alias mw5='mosh worker5'
+alias mw6='mosh worker6'
 
 # Git shortcuts
 gitcheckout() {
@@ -206,9 +228,11 @@ function prompt_command {
 
 # Bind up/down arrows history search.
 case "$TERM" in *xterm*|rxvt*|Eterm|aterm|kterm|gnome*|interix|screen|screen-256color)
-	bind '"\e[A": history-search-backward' >/dev/null 2>/dev/null
-	bind '"\e[B": history-search-forward' >/dev/null 2>/dev/null
-    color_prompt=yes
+    # bind '"\e[A": history-search-backward' >/dev/null 2>/dev/null
+    # bind '"\e[B": history-search-forward' >/dev/null 2>/dev/null
+    bind '"\e[A": history-search-backward'
+    bind '"\e[B": history-search-forward'
+
     ;;
 *)
     ;;
@@ -217,11 +241,11 @@ esac
 # Set tmux/screen window titles
 case "$TERM" in
     screen)
-        export PROMPT_COMMAND='echo -ne "\033]2;${USER}@${HOSTNAME}: ${PWD}\007\033k${USER}@${HOSTNAME}\033\\";  prompt_command'
-        ;;
+      export PROMPT_COMMAND='echo -ne "\033]2;${USER}@${HOSTNAME}: ${PWD}\007\033k${USER}@${HOSTNAME}\033\\";  prompt_command'
+      ;;
 *)
-	export PROMPT_COMMAND='prompt_command;'
-	;;
+    export PROMPT_COMMAND='prompt_command;'
+    ;;
 esac
 
 # Prompt, Looks like:
