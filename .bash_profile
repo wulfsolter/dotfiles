@@ -93,7 +93,9 @@ alias nano='vim'
 code() {
   # Get root of current git directory
   # https://unix.stackexchange.com/a/6470
-  CURRENT_WORKSPACE_DIR=$(git rev-parse --show-toplevel)
+  # Currently breaks if running "code ../../some/path" from a different PWD
+  # What I really want is to scan parents of the target to see if any of the parents have a "vscode.code-workspace" file
+  CURRENT_WORKSPACE_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 
   # wrap the whole shit in double quotes and then more escaped double quotes around that
   VSCODE_PATH=\""/mnt/c/Users/Lenovo/AppData/Local/Programs/Microsoft VS Code/bin/code"\"
