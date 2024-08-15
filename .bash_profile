@@ -49,6 +49,9 @@ shopt -s sourcepath                 # The source command will use the PATH varia
 ##### History management section
 HISTFILESIZE=100000000
 HISTSIZE=100000000
+# Avoid duplicates
+HISTCONTROL=ignoredups:erasedups
+# When the shell exits, append to the history file instead of overwriting it
 shopt -s histappend
 shopt -s histverify
 set -b
@@ -64,13 +67,10 @@ complete -W "$(echo `cat ~/.bash_history | egrep '^ssh ' | sort | uniq | sed 's/
 complete -W "$(echo `cat ~/.bash_history | egrep '^mosh ' | sort | uniq | sed 's/^mosh //'`;)" mosh
 
 # stop the noisey bell!!
-bind 'set bell-style none'
+# bind 'set bell-style none'
 
 # make me slutty - all my friends can play with my bits
 umask 002
-
-# History across sessions
-PROMPT_COMMAND="history -n; history -a"
 
 ##### Aliases and commands
 # modified commands
@@ -98,7 +98,7 @@ code() {
   CURRENT_WORKSPACE_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 
   # wrap the whole shit in double quotes and then more escaped double quotes around that
-  VSCODE_PATH=\""/mnt/c/Users/Lenovo/AppData/Local/Programs/Microsoft VS Code/bin/code"\"
+  VSCODE_PATH=\""/snap/bin/code"\"
 
   # If CURRENT_WORKSPACE_DIR returned a path and that path has a vscode.code-workspace file
   if ! [[ $CURRENT_WORKSPACE_DIR == *"fatal: not a git repository" ]] && [ -f "${CURRENT_WORKSPACE_DIR}/vscode.code-workspace" ]; then
@@ -194,6 +194,8 @@ function prompt_command {
     # Make history happen, regardless of windows/panes/tabs/etc
     history -n
     history -a
+    history -c
+    history -r
 
     # Set term title to user@hostname/pwd
     echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"
