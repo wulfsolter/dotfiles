@@ -194,8 +194,6 @@ function prompt_command {
     # Make history happen, regardless of windows/panes/tabs/etc
     history -n
     history -a
-    history -c
-    history -r
 
     # Set term title to user@hostname/pwd
     echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"
