@@ -6,7 +6,7 @@ set completion-ignore-case On
 
 # Disable bracketed paste mode
 # https://askubuntu.com/questions/662222/why-bracketed-paste-mode-is-enabled-sporadically-in-my-terminal-screen
-bind 'set enable-bracketed-paste off'
+# bind 'set enable-bracketed-paste off'
 
 set meta-flag on
 set input-meta on
