@@ -3,7 +3,7 @@
 
 ##### Define options
 export EDITOR="vim"
-export GREP_COLOR="1;33"
+export GREP_COLORS="mt=1;33"
 export VISUAL=$EDITOR
 
 # Set locale
