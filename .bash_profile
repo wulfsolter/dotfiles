@@ -163,8 +163,8 @@ if [ $UID -ne 0 ]; then
 fi
 
 ### Bash completion for git if available
-if [ -f ~/code/wherewolf/helperscripts/git-completion.bash ]; then
-  . ~/code/wherewolf/helperscripts/git-completion.bash
+if [ -f /usr/share/bash-completion/completions/git ]; then
+  . /usr/share/bash-completion/completions/git
 fi
 
 ### Get docker shit for Wherewolf
