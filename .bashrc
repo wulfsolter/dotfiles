@@ -12,3 +12,6 @@ export NVM_DIR="$HOME/.nvm"
 
 # LibGL
 export LIBGL_ALWAYS_INDIRECT=1
+
+# Created by `pipx` on 2024-09-08 02:02:53
+export PATH="$PATH:/home/wulf/.local/bin"

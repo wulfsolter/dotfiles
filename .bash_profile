@@ -23,6 +23,11 @@ export WW_CODE_DIR=/home/wulf/code/wherewolf
 # Clone Row
 export PATH="$PATH:$HOME/code/clone-row";
 
+# Node Version Manager
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
 if [ "$HOSTNAME" = thinkpad ]; then
     alias logstalgiaWherewolf='ssh wherewolf-WORKER0001 "tail -f /var/log/nginx/wherewolf.log" | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
     # alias logstalgiaWherewolf='ssh wherewolf-WORKER0001 "tail -f /var/log/nginx/wherewolf.log" | grep -v "uptimeCheck" | logstalgia --sync --full-hostnames --update-rate 1 -g "API,URI=.*,100"'
@@ -98,7 +103,7 @@ code() {
   CURRENT_WORKSPACE_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
 
   # wrap the whole shit in double quotes and then more escaped double quotes around that
-  VSCODE_PATH=\""/snap/bin/code"\"
+  VSCODE_PATH=\""/usr/share/code/bin/code"\"
 
   # If CURRENT_WORKSPACE_DIR returned a path and that path has a vscode.code-workspace file
   if ! [[ $CURRENT_WORKSPACE_DIR == *"fatal: not a git repository" ]] && [ -f "${CURRENT_WORKSPACE_DIR}/vscode.code-workspace" ]; then
@@ -173,8 +178,47 @@ if [ -f ~/code/wherewolf/helperscripts/bash/core ]; then
 fi
 
 ## get current git branch
+GREEN='\033[32m'
+RED='\033[31m'
+BLANK='\033[0m'
+gitStatusSymbols() {
+    local gitstatus=$(git status --porcelain 2> /dev/null)
+    if [ -n "$gitstatus" ]; then
+         local statusString="";
+         if [ -n "$(echo "$gitstatus" | grep '^[^? ]')" ]; then
+                statusString="$statusString$GREEN+$BLANK"
+         fi
+         if [ -n "$(echo "$gitstatus" | grep '^.[^? ]')" ]; then
+                statusString="$statusString$RED*$BLANK"
+         fi
+         if [ -n "$(echo "$gitstatus" | grep '^[?][?]')" ]; then
+                statusString="$statusString?"
+         fi
+         echo -e " $statusString"
+    fi
+}
+
+gitUpstreamPosition() {
+    local commitCount=$(git rev-list --count --left-right @{upstream}...HEAD 2> /dev/null)
+    if [ -n "$commitCount" ]; then
+       local behindCount=$(echo -n "$commitCount" | cut -f1)
+       local aheadCount=$(echo -n "$commitCount" | cut -f2)
+       if [ "$behindCount" != "0" ]; then
+           echo -n " ${behindCount}↓"
+       fi
+       if [ "$aheadCount" != "0" ]; then
+          echo -n " ${aheadCount}↑"
+       fi
+    fi
+}
+
 parse_git_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    local branchName=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
+    if [ -n "$branchName" ]; then
+       echo -e " [🌱 ${branchName}$(gitStatusSymbols)$(gitUpstreamPosition)]"
+    fi
+
+    # git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
 }
 
 # function to run something multiple times
@@ -198,7 +242,7 @@ function prompt_command {
     # Set term title to user@hostname/pwd
     echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"
 
-    #Give a new line - the -e flag is for echo to enable interpretaion of backslash escapes
+    #Give a new line - the -e flag is for echo to enable interpretation of backslash escapes
     #echo -e "\n"
     echo ''
 
@@ -251,7 +295,7 @@ case "$TERM" in
 esac
 
 # Prompt, Looks like:
-# ┌─[username@host]-[time date]-[directory]
+# ┌─[username@host]-[time date]-[directory] (branch)
 # └─[$]->
 
 PS1='\[\e[0;36m\]┌─[\[\e[0;32m\]\u\[\e[0;34m\]@\[\e[0;31m\]\h\[\e[0m\e[0;36m\]]-[\[\e[0m\]`date +%Y-%m-%d\ %R` - `date +%s`\[\e[0;36m\]]-[\[\e[33;1m\]\w\[\e[0;36m\]]\[\e[0;32m\]`parse_git_branch`\n\[\e[0;36m\]└─[\[\e[35m\]\$\[\e[0;36m\]]->\[\e[0m\] '
